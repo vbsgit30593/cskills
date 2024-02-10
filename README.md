@@ -12,4 +12,9 @@ memcpy(dest, src, total mem to copy)
 ```
 Copies from src to dest for the requested amt of memory.
 
+## How to set a memory/array with some values
+```c
+memset(dest, value, total memory to set)
+```
 
+Set value to each byte of referenced memory
