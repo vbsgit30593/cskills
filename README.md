@@ -54,3 +54,54 @@ Here, `%02x` => Use atleast two character to represent number and pad rest with 
 * Here, in the next call we pass `NULL` to `strtok` as that hints it to continue tokenizing the string.
 * Returns `NULL` when there are no more tokens left.
 > **Warning:** strtok modifies the original string! It adds `\0` in the place of the delimiter.
+
+## Use of const in function param list
+```c
+    // Function to print the members of a structure
+    void printStruct(const void *structurePtr, size_t size) {
+        // Cast the structure pointer to a char pointer
+        const char *ptr = (const char *)structurePtr;
+        
+        // other code
+    }
+```
+
+* Here `const void *structurePtr` ensures that the function will not modify the actual memory.
+* It also ensures that the parameter can take both const and non-const arguments
+
+## Returning strings from functions
+```c
+    const char* getString(){
+        return "test";
+    }
+
+    int main(void){
+        const char* ptr = getString();
+    }
+```
+
+* We use const here to indicate that string "test" is present in a different read-only area of memory(not stack/heap).
+* Refer `returnString.c` for solution!
+
+## Comparing strings
+```c
+int ret = strcmp(str1, str2)
+```
+
+* ret = 0, str1 == str2
+* ret = 1, for any char asc(str1) > asc(str2)
+* ret = -1, for any char asc(str1) < asc(str2)
+
+```c
+int ret1 = strncmp(str1, str2, numCharstoCompare)
+int ret2 = memcmp(str1, str2, numCharstoCompare)
+```
+
+> **Difference**: memcmp doesn't stop at null char and `memcmp takes void*`!
+
+## How to prevent memory padding?
+```c
+#pragma pack(1)
+```
+* align at 1 byte!
+* applies for the whole compilation unit
