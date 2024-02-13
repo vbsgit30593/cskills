@@ -105,3 +105,21 @@ int ret2 = memcmp(str1, str2, numCharstoCompare)
 ```
 * align at 1 byte!
 * applies for the whole compilation unit
+
+## Reading multiple sentences from console
+### Approach - 1
+```c
+    printf("Enter input text 1!\n");
+    scanf("%[^\n]s", text1);
+    printf("Inputed text: %s\n", text1);
+
+    getchar();
+    printf("Enter input text 2!\n");
+    scanf("%[^\n]s", text2);
+    printf("Inputed text: %s\n", text2);
+```
+
+`[^\n]` implies that we would read till we encounter a `\n`
+We use a `getchar()` in between to ensure that the `\n` character is consumed
+
+### Approach - 2
