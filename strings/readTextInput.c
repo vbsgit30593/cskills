@@ -3,15 +3,6 @@
 #include <stdlib.h>
 
 
-void betterRead() {
-    // Use fgets
-    char text[100];
-    printf("Lets read a paragraph of text\n");
-    fgets(text, 100, stdin);
-
-    printf("Data read: %s \n", text);
-    
-}
 int main(int argc, char* argv[])
 {
     char text1[100], text2[100];
@@ -29,5 +20,12 @@ int main(int argc, char* argv[])
     scanf("%[^\n]s", text2);
     printf("Inputed text: %s\n", text2);
 
+/*
+    char text3[100];
+    printf("Lets read a paragraph of text\n");
+    fgets(text3, 100, stdin);
+    text3[strlen(text3) - 1] = '\0';
+    printf("Data read: %s\n", text3);
+*/
     return 0;
 }

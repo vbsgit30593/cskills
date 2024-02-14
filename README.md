@@ -109,17 +109,22 @@ int ret2 = memcmp(str1, str2, numCharstoCompare)
 ## Reading multiple sentences from console
 ### Approach - 1
 ```c
-    printf("Enter input text 1!\n");
-    scanf("%[^\n]s", text1);
-    printf("Inputed text: %s\n", text1);
+printf("Enter input text 1!\n");
+scanf("%[^\n]s", text1);
+printf("Inputed text: %s\n", text1);
 
-    getchar();
-    printf("Enter input text 2!\n");
-    scanf("%[^\n]s", text2);
-    printf("Inputed text: %s\n", text2);
+getchar();
+printf("Enter input text 2!\n");
+scanf("%[^\n]s", text2);
+printf("Inputed text: %s\n", text2);
 ```
 
 `[^\n]` implies that we would read till we encounter a `\n`
 We use a `getchar()` in between to ensure that the `\n` character is consumed
 
 ### Approach - 2
+```c
+fgets(text, 100, stdin)
+text[strlen(text) - 1] = '\0';
+```
+* We need to set to `\0` since fgets reads the \n char as well.
