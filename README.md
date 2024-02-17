@@ -128,3 +128,64 @@ fgets(text, 100, stdin)
 text[strlen(text) - 1] = '\0';
 ```
 * We need to set to `\0` since fgets reads the \n char as well.
+
+## strcpy vs strncpy
+### strcpy
+* copies the null character as well
+* performs unrestricted copy and hence more prone to buffer overflow
+
+### strncpy
+* doesn't copy null terminator if count is reached before the entire string is copied
+* limits the number of character copied
+
+```c
+strncpy(dest, src, strlen(src) + 1)
+```
+* This ensures that the null character is copied! or just add a null terminator at the end of the copied string.
+
+## clean way to convert for to while loop
+```c
+int i = -1;
+while (++i < size){
+    printf("%d\n", ar[i])
+}
+```
+
+## Array varible special behavior
+```c
+int ar[] = {1, 2, 3};
+ar = ar + 1;
+```
+
+* This does not work and generates a compilation error
+`Arrays in C and C++ are not modifiable lvalues; you cannot assign values to them as a whole.`
+
+```c
+int ar[] = {1, 2, 3};
+int *ptr = ar;
+ptr++;
+```
+
+* This works without any issues since `array variable decays to a ptr`.
+
+## Dynamic memory reallocation
+```c
+mem1 = realloc(mem1, 64 * sizeof(int));
+```
+
+Its important to store the returned value in the array because realloc might sometimes free the existing memory and allocate the whole block again if its unable to find enough adjacent memory.
+
+## Passing and updating structs
+```c
+void getMiddle(const Point* p1, const Point* p2, Point* mid){
+    // logic
+}
+
+int main(void){
+    Point p1, p2, mid;
+    getMiddle(&p1, &p2, &mid);
+}
+```
+
+* `const` used here indicates that we dont modify p1 and p2 memory locations
+* The benefit of passing the address to mid is that we don't need to worry about stack or freeing heap memory issues.
