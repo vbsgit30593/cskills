@@ -189,3 +189,101 @@ int main(void){
 
 * `const` used here indicates that we dont modify p1 and p2 memory locations
 * The benefit of passing the address to mid is that we don't need to worry about stack or freeing heap memory issues.
+
+## How to obtain the actual variable name while printing
+```c
+#define PRINT_VAR(X) \
+    printf(#X " is %d at addr %p\n", X, &X)
+// a is 10 at addr 0x16dc46ce8
+
+PRINT_VAR(a);
+// PRINT_VAR(10); 
+```
+
+`PRINT_VAR(10)` will have a compilation error!
+
+```c
+#define SWAP(A, B) A ^= B ^= A ^= B
+```
+
+> The above is a one line SWAP !!
+
+## function pointers
+```c
+// <return type> (*identifier) (param1, param2, ...)
+long long sum(int a, int b);
+int main(void){
+    long long (*fptr) (int, int);
+    fptr = &sum;
+    int s = fptr(10, 20);
+}
+```
+## Integer type conversions
+* When expanding variables, we see the `Sign Bit and padding the larger number accordingly`.
+
+```c
+short int x = -16384;
+int y = 1073741824;
+x = y;
+// result: (x, y) = (0, 1073741824)
+```
+
+* We are trying to assign a bigger type to a smaller type
+* C takes the LSBits of the bigger number and assigns it to smaller number
+* `trimming` : Effectively does a modulo `y % 2^(bits in x)`
+
+## Unions and Anonymous unions
+```c
+typedef union {
+    unsigned int v4addr;
+    char octets[4];
+} Example;
+```
+* Here, on updating v4addr we can obtain individual octets.
+
+```c
+typedef struct {
+    union 
+    {
+       float value;
+       double valueExtended;
+    };
+
+    bool isExtended;
+} CustomFloat;
+```
+
+## Writing to a file
+```c
+FILE *fp = fopen("file.dat", "w");
+if (fp == NULL){
+    return 1;
+}
+
+// write a buffer of data to file
+size_t bytes_written = fwrite(buf, size_per_elem, nitems, fp);
+if (bytes_written != nitems){
+    return 2;
+}
+```
+
+#### File read
+```c
+fp_in = fopen("point.dat", "r");
+if (fp_in == NULL){
+    return 1;
+}
+
+// read to  buffer
+if (fgets(inp_buf, 256, fp_in) == NULL){
+    fclose(fp_in);
+    return 3;
+}
+
+// read from buffer to struct
+sscanf(inp_buf, fmt, &p1.x, &p1.y);
+fclose(fp_in);
+```
+
+> The above steps are called `Serialization `and `De-Serialization`
+
