@@ -287,3 +287,128 @@ fclose(fp_in);
 
 > The above steps are called `Serialization` and `De-Serialization`
 
+## Reading/Writing from/to binary file
+```c
+fp1 = fopen("point.bin", "wb");
+if (fp1 == NULL ){
+    return 1;
+}
+
+size_t elems_written = fwrite(&p1, sizeof(Point), 1, fp1);
+if (elems_written == 0){
+    return 2;
+}
+```
+
+> Use a hex editor to check the file
+* Note how this can help us in analysing memory!
+
+#### Reading from binary file
+```c
+// Read from binary file
+fp = fopen("point.bin", "rb");
+size_t elems_read = fread(&point, sizeof(Point), 1, fp);
+if (elems_read == 0){
+    printf("Unsuccessful fread\n");
+    return 3;
+}
+```
+
+* fread reads to the memory location (Here struct).
+* returns 0 in case of read failure.
+
+### Improvements
+```c
+int bytes_wrote = fprintf(fp_out, fmt, p.x, p.y);
+int elems_read = fscanf(fp_in, fmt, &p1.x, &p1.y);
+```
+
+```c
+fp = fopen("point.dat", "w+");
+```
+
+* here, `w+` means -> open the file for reading and writing but if file already exists, overwrite it!
+* trivially reading and writing wouldn't work since the cursor inside the file moves to next line after write
+    * So, we need to fseek and move cursor back to start of file for reading.
+
+```c
+fseek(fp, 0, SEEK_SET);
+```
+
+### binary vs text files
+* Binary files are arch dependent! (lack of portability)
+    * Ex - a ptr is 4 bytes on 32 bit and 8 bytes on 64bit system
+    * Also affected by endianness
+* Text files need modification in format every time your change the structure
+* Binary file read and write is fast while text file need to create buffer first
+* Other options: `SEEK_SET`, `SEEK_CUR`, `SEEK_END`
+
+## sizeof quirk
+```c
+int a = 10;
+printf("sizeof a: %lu \n", sizeof(++a));
+printf("a = %d\n", a);
+```
+* Here, a = 10 and not 11 since `sizeof` is a `compile time` operation.
+* ++a substitutes to 10 before execution.
+
+## const keyword
+```c
+int n = 10, m = 20;
+const int* ptr = &n;
+int* const ptr1 = &n;
+// *ptr = 20; // not allowed
+ptr = &m;
+*ptr1 = 30;
+// ptr1 = &m; // not allowed
+```
+
+#### ptr to const integer : `const int* ptr`
+* Using this ptr, we can't modify the value stored at the pointer memory
+* We can change what ptr points to
+
+#### const ptr to integer: `int * const ptr`
+* What this ptr points to cant change
+* the memory being pointer can change
+
+## gets issues and alternatives
+```c
+gets(buf)
+```
+
+* The problem is that gets allows us to read in unrestricted manner.
+* So, we might end up copying way beyond the expected buffer size and corrupt the stack
+
+#### use fgets
+```c
+fgets(buf, size, stdin)
+```
+
+* read from stdin or file (fd)
+* reads only the size elements.
+
+## renaming a file
+```c
+int res = rename("point1.dat", "point2.dat");
+if (res == 0){
+    printf("File renamed successfully\n");
+}
+else{
+    char buf[256];
+    printf("Failed to rename: %s\n", strerror(errno));
+}
+```
+* Return 0 if successful!
+
+## BITWISE ops to check flags
+> Refer the code for `flagsBitwise.c`
+
+### copy string using strdup
+```c
+char str[] = "hello"; 
+char *new = strdup(str);
+free(new);
+```
+
+* remember to free the allocated memory
+* no limit on size of memory being copied
