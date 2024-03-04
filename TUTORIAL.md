@@ -412,3 +412,27 @@ free(new);
 
 * remember to free the allocated memory
 * no limit on size of memory being copied
+
+## converting strings to numbers
+### Problems with atoi
+* Conversions beyond max/min limits have undefined behavior
+* No way to know when the conversion stops
+* Cant convert from other bases!
+
+```c
+char str1[] = "1111111111111";
+char str2[] = "101 name";
+char str3[] = "0x10101";
+int num = atoi(anystring);
+
+### use strtok<> functions
+```c
+long int newnum = strtol(str4, NULL, 16);
+newnum = strtol(str5, NULL, 0);
+char *next;
+newnum = strtol(str3, &next, 0);
+```
+
+* these family of function can help convert from any base to expected type
+* we can specify a buf addr to obtain the location where we stop processing.
+* the base can be automatically determined by using option 0 as 3rd arg
