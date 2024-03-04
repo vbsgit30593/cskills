@@ -424,6 +424,7 @@ char str1[] = "1111111111111";
 char str2[] = "101 name";
 char str3[] = "0x10101";
 int num = atoi(anystring);
+```
 
 ### use strtok<> functions
 ```c
