@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 
 int main(void){
     char str1[] = "101";
-    char str2[] = "111111111111";
+    char str2[] = "1111111111111111111111111111111111";
     char str3[] = "124 name";
     char str4[] = "0x124";
     char str5[] = "01011";
@@ -40,5 +41,8 @@ int main(void){
     newnum = strtol(str3, &next, 0);
     printf("Original string: %s, Converted number: %ld, name: %s \n", str5, newnum, next);
 
+    newnum = strtol(str2, &next, 0);
+    printf("Original string: %s, Converted number: %ld, name: %s \n", str2, newnum, next);
+    printf("%d, %s\n", errno, strerror(errno));
     return 0;
 }

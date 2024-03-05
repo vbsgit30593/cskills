@@ -437,3 +437,55 @@ newnum = strtol(str3, &next, 0);
 * these family of function can help convert from any base to expected type
 * we can specify a buf addr to obtain the location where we stop processing.
 * the base can be automatically determined by using option 0 as 3rd arg
+
+#### Sets errno if string is too large
+```c
+char str2[] = "1111111111111111111111111111111111";
+newnum = strtol(str2, &next, 0);
+printf("Original string: %s, Converted number: %ld, name: %s \n", str2, newnum, next);
+printf("%d, %s\n", errno, strerror(errno));
+```
+
+#### Use it to check parsed numbers
+```c
+if (endptr == str){
+    printf("Number could not be parsed\n");
+    return;
+}
+if (errno == ERANGE) {
+    printf("Number too large to parse!\n");
+    return;
+}
+```
+
+## Random numbers
+### random in range
+```c
+int rand_interval(int low, int high) {
+    int interval = high - low;
+    return (rand() % interval) + low;
+}
+```
+* Generates number betn low and high
+
+```c
+double rand_double(){
+    // gets us numbers between 0 and 1
+    return rand() / (double)RAND_MAX;
+}
+
+double rand_double_range(int low, int high){
+    // gets us floating point numbers between low and high
+    return (rand_double() * (high - low)) + low;
+}
+```
+
+## Good practices while freeing the memory
+* Make sure to set ptr to NULL after free! Do this always
+  * This will ensure that subsequent free calls dont cause issues
+  * free doc says that if ptr is a null pointer then do nothing
+
+```c
+free(arr);
+arr = NULL;
+```
