@@ -489,3 +489,13 @@ double rand_double_range(int low, int high){
 free(arr);
 arr = NULL;
 ```
+
+## String formatting
+* Use format macros to prevent rewriting complex formats
+
+```c
+#define FORMAT "({%d}, {%d})"
+printf("Point is : "FORMAT, a, b);
+```
+
+* String literals directly get concatenated
