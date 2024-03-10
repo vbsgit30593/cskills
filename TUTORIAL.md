@@ -499,3 +499,95 @@ printf("Point is : "FORMAT, a, b);
 ```
 
 * String literals directly get concatenated
+
+## strspn vs strcspn vs strpbrk
+### `strspn`
+* string span
+* returns the length of the initial segment of the string that matches a given set of chars
+* Note that it starts its check from the first character and would return 0 if check fails
+
+```c
+char* str = "20 years old";
+size_t len = strspn(str, "0123456789")
+```
+* The above example returns len = 2 which can be used to print the substring
+
+### strpbrk
+* string pointer to break
+* Returns the pointers to the character in the string where the first match occurs
+
+```c
+char *str = "Hello I am 20 years old";
+char *ptr = strpbrk(str, "0123456789")
+```
+
+* Here, ptr = &(character 2) in str.
+
+> Combine `strpbrk` and `strspn` to obtain the actual numeric substring.
+
+### strcspn
+* complement of string span
+* returns the number of len of initial subset such that it doesn't match charset
+
+## trick to print string slice in just one printf in C
+```c
+printf("strcspn: Initial string data - %.*s\n", count_not_num, orig);
+```
+* Here, `%.*s` implies variable width string and width can be provided dynamically
+
+## size_t format specifier
+```c
+printf("%zd\n", i);
+```
+`%zd` is the special format spec for size_t
+
+## String concatenation
+### `strcat` vs `strncat`
+#### strcat
+* No restriction on number of characters concatenated and can hence lead to stack corruption
+
+#### strncat
+```c
+strncat(firstString, secondString, numCharsToCopy);
+```
+
+In itself, it doesn't prove to be helpful, but we can use it to write a secure code
+```c
+char str1[MAX] = "Hello";
+char str2[] = "asdasdsadasdaasdasdasdasdad";
+strncat(str1, str2, MAX - strlen(str1) - 1);
+```
+Now, the `maxchar(str1) = MAX`
+
+> strcat_s is the safer option but not available always. It leads to a crash though.
+
+## String replace
+```c
+char* string_replace(char* source, size_t sourceSize, char* substring, char* with) {
+    // returns the substring end address of the updated string
+    // or NULL if replacement failed */
+    // handle case when replacement can cause mem overflow
+    if (sourceSize < (strlen(source) + 1 + (strlen(with) - strlen(substring)))) {
+        return NULL;
+    }
+
+    char* substring_start = strstr(source, substring);
+    if (substring_start == NULL) {
+        return NULL;
+    }
+
+    // move the memory to fit in the new replacement string
+    memmove(
+        substring_start + strlen(with),
+        substring_start + strlen(substring),
+        strlen(substring_start) - strlen(substring) + 1
+    );
+
+    // copy the replacement string
+    memcpy(substring_start, with, strlen(with));
+
+    // We used memcpy here instead of strcpy
+    // since strcpy adds a \0 character at the end.
+    return substring_start + strlen(with);
+}
+```
