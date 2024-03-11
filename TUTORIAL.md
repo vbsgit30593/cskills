@@ -591,3 +591,59 @@ char* string_replace(char* source, size_t sourceSize, char* substring, char* wit
     return substring_start + strlen(with);
 }
 ```
+
+## Header file #ifndef and #pragma once
+```c
+#ifndef HEADER_H
+#define HEADER_H
+void headerFunc(int, int);
+#endif
+///// or
+#pragma once
+void headerFunc(int, int);
+```
+
+* here, `#ifndef` ensures that the functions are included only once even if the header file is included multiple times.
+
+> `#pragma once` does the same thing but isn't a standard.
+
+## Pointers to pointers
+* It is generally used when we want to change what pointer variable points to.
+* For example, just having a `char *` as a parameter would lead to a local copy and updating this will not refelect the changes in the caller
+* Pointers can infinite levels of dereferencing as well.
+
+```c
+    unrealPointers(&&&&&origptr);  
+```
+
+* This is an error since `&origptr is an r-value and & operator needs an l-value`
+* So, we need to store the result always to get address further.
+
+```c
+void unrealPointers(char***** ptr) {
+    ****ptr = "After final update";
+}
+
+// unusual pointers
+char** str1 = &origptr;
+char*** str2 = &str1;
+char**** str3 = &str2;
+unrealPointers(&str3);
+```
+
+## exec family of functions
+* execl, execv, execlp, execvp, execlpe, execvpe
+* Note that on triggering exec, current process is replaced by the new program
+So, the rest of the code does not get executed.
+```c
+/* EXECVP */
+char* cmd[] = {
+    "ping",
+    "-c",
+    "2",
+    "google.com",
+    NULL
+};
+```
+
+
