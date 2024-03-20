@@ -646,4 +646,8 @@ char* cmd[] = {
 };
 ```
 
+## strerror_r issues to think about
+* https://www.club.cc.cmu.edu/~cmccabe/blog_strerror.html
+
+
 
