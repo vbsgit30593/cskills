@@ -253,6 +253,25 @@ typedef struct {
 } CustomFloat;
 ```
 
+## Tagged unions
+```c
+typedef struct {
+    enum type IP_TYPE;
+    union {
+        struct in_addr ipv4;
+        struct in6_addr ipv6;
+    } ipaddr;
+} ip_t;
+
+typedef struct {
+    enum type IP_TYPE;
+    union {
+        struct in_addr ipv4;
+        struct in6_addr ipv6;
+    };
+} ip_t;
+```
+
 ## Reading & Writing to a file
 ```c
 FILE *fp = fopen("file.dat", "w");
@@ -651,3 +670,57 @@ char* cmd[] = {
 
 
 
+## Lookup tables in C - Designated initializers
+```c
+static char case_converter[] = {
+    ['a'] = 'A',
+    ['b'] = 'B',
+    ['c'] = 'C',
+};
+
+int main(int argc, char **argv)
+{
+    printf("Upper case of 'a' is %c\n", case_converter['a']);
+    return 0;
+}
+```
+
+## Bit flags
+```c
+#define FLAG_A (1 << 0)
+#define FLAG_B (1 << 1)
+#define FLAG_C (1 << 2)
+
+void take_action(FLAGS_TYPE flags)
+{
+    if (flags & FLAG_A)
+    {
+        printf("FLAG_A\n");
+    }
+    if (flags & FLAG_B)
+    {
+        printf("FLAG_B\n");
+    }
+    if (flags & FLAG_C)
+    {
+        printf("FLAG_C\n");
+    }
+    printf("---\n");
+}
+```
+
+## bitfields
+```c
+#pragma pack(1)
+
+typedef struct {
+    int first: 4;
+    int second: 4;
+    int alone: 1;
+    int last: 7;
+} bitfields;
+```
+
+* Here, `sizeof(bitfields)` would return 2.
+* Without `#pragma pack(1)` we would get 4
+* Without bitfields, we would waste memory and end up with 16 bytes
