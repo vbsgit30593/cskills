@@ -684,6 +684,17 @@ int main(int argc, char **argv)
     return 0;
 }
 ```
+* Its possible to even provide values for ranges of indices
+
+* With structs, we could do it this way - 
+```c
+SomeStruct s = {
+    .a = 10,
+    .b = 20,
+    .c = 30
+};
+```
+
 
 ## Bit flags
 ```c
@@ -724,3 +735,153 @@ typedef struct {
 * Here, `sizeof(bitfields)` would return 2.
 * Without `#pragma pack(1)` we would get 4
 * Without bitfields, we would waste memory and end up with 16 bytes
+
+### variable arglist
+
+```c
+int sum(int count, ...)
+{
+    va_list ap;
+    va_start(ap, count);
+    int sum = 0;
+    for (int i = 0; i < count; ++i)
+    {
+        sum += va_arg(ap, int);
+    }
+    va_end(ap);
+    return sum;
+}
+```
+
+### Why should we use do { statement; } while (0); idiom and not  {..}
+* A macro is supposed to be treated as single statement
+  * Wrapping the macro body within a do while guarantees that it will be treated as a single statement even with complex control structures
+* Example - The following code fails compilation - 
+```c
+
+#define SUM(a, b) {             \
+    int sum = 0;                \
+    for (int i = a; i < b; i++) \
+        sum += i;               \
+    printf("Sum : %d\n", sum);  \
+}
+
+int main(void)
+{
+    int a = 10, b = 20;
+    if (1)
+        SUM(a, b);
+    else
+        printf("else\n");
+    return 0;
+}
+```
+
+`Fails because the compiler sees an ambiguous ; here.`
+
+* Another tip is that we should always parenthesize each param.
+
+### macros special features
+#### Stringify variables
+```c
+#define print(a, b) printf("(%s, %s) = (%d, %d)\n", #a, #b, (a), (b))
+int main(void)
+{
+    int a = 10, b = 20;
+    print(a, b);
+    return 0;
+}
+```
+
+#### Dynamically creating variables using macros
+```c
+#define VAR(x) new_##x
+#define GETVAR(x) new_##x
+
+int main(void)
+{
+    int VAR(c) = 10;
+    printf("New value : %d\n", GETVAR(c));
+    return 0;
+}
+```
+
+Note the use of `##` for concatenation.
+This approach can be used to create generic types.
+
+### Anonymous structs and arrays
+
+```c
+struct Vector {
+    int x;
+    int y;
+};
+
+void print_point(struct Vector v)
+{
+    printf("(x, y) : (%d, %d)\n", v.x, v.y);
+}
+
+int main(void)
+{
+    // Look at how we didn't need to declare here
+    print_point((struct Vector){10, 20});
+    return 0;
+}
+```
+
+* Similarly we can have arrays anonymized
+```c
+print_array(5, (int []){1, 2, 3, 4, 5});
+```
+
+`These are called compound literals in C.`
+
+### __VA_ARGS__ - Variadic macros
+* Used primary for logging of for creating printf wrappers. 
+* Constructs and prints variable args
+
+```c
+#define PRINTF_VARS(func, count, ...) do {           \
+    for (int i = 0; i < count; ++i)       \
+        printf("Function " #func ": " __VA_ARGS__);              \
+} while (0)
+
+void func();
+
+int main(void)
+{
+    PRINTF_VARS(func, 10, "hello %d whats up %s\n", 10, "vaibhav");
+    PRINTF_VARS(func, 5, "hello %d more args here %s - new arg %f\n", 10, "vaibhav", 1.1);
+    return 0;
+}
+```
+Output
+```
+Function func: hello 10 whats up vaibhav
+Function func: hello 10 whats up vaibhav
+Function func: hello 10 more args here vaibhav - new arg 1.100000
+Function func: hello 10 more args here vaibhav - new arg 1.100000
+Function func: hello 10 more args here vaibhav - new arg 1.100000
+```
+
+`Note how we can pass variable number of args here!`
+
+### Variable length arrays
+```c
+int length = 10;
+int array[length];
+```
+
+The same can be done using `alloca` as well
+```c
+int *other;
+other = alloca(length * (sizeof *other));
+```
+
+#### Some points
+* We can't initialize variable length arrays
+* We should avoid using these arrays since they can pose security risks if we create it using user input.
+* This is useful for dynamic stack allocations and should be used for small temporary allocations.
+
+
