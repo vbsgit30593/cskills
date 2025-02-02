@@ -35,3 +35,17 @@ L: Length of line
         token = strtok_r(NULL, delim, &saveptr);
     }
 ```
+
+## Match prefixes rather than full words
+```c
+    if (strncmp(word, words[i], strlen(word)) == 0)
+    {
+        // matched word
+    }
+```
+* This matches the first n characters only.
+
+## Passing char** to const char**
+* https://stackoverflow.com/questions/14562845/why-does-passing-char-as-const-char-generate-a-warning
+
+
