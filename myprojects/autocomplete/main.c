@@ -50,8 +50,13 @@ int main(int argc, char *argv[])
     snprintf(filepath, 100, "%s/%s", ROOT_DATA_PATH, argv[1]);
     const char* searchword = argv[2];
     int token_count = naive_read_from_file(filepath, words);
+    // Note: this can be improved by chunked memory allocation but in our case
+    // the current approach is fine if we tokenize the whole file as that's close
+    // to a million tokens already.
+    // With that knowledge, it would be more performant to simply have a huge static memory
     printf("Naive token memory size: %fMB\n",
         naive_mem_in_use(words, MAX_TOKEN_COUNT, token_count)/1e+6);
     naive(words, token_count, searchword);
+    naive_free(words, token_count);
     return 0;
 }

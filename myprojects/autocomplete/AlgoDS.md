@@ -48,4 +48,7 @@ L: Length of line
 ## Passing char** to const char**
 * https://stackoverflow.com/questions/14562845/why-does-passing-char-as-const-char-generate-a-warning
 
-
+## remember to use strdup while tokenizing
+* Dont directly use the tokens from the buffer. The obtained token just points to the next token address
+* We should ideally do a strdup of the token
+* later we should free all the memory

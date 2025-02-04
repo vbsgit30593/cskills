@@ -66,3 +66,11 @@ size_t naive_mem_in_use(const char **tbl, size_t static_count, size_t actual_tok
     }
     return total;
 }
+
+void naive_free(const char** words, size_t token_count)
+{
+    for (int i = 0; i < token_count; ++i)
+    {
+        free((void *)words[i]);
+    }
+}

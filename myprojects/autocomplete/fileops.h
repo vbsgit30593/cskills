@@ -74,7 +74,7 @@ int read_whole_file_and_tokenize(FILE* fptr, const char *words[])
 
     // printf("data read: %s\n", buf);
     char *token, *saveptr;
-    char *delim = " ";
+    const char *delim = " ";
     token = strtok_r(buf, delim, &saveptr);
     int i = 0;
     int total_tokens = 0;
@@ -83,7 +83,8 @@ int read_whole_file_and_tokenize(FILE* fptr, const char *words[])
         if (token_to_lower(token))
         {
             // printf("Updated token: %s\n", token);
-            words[i++] = token;
+            words[i++] = strdup(token);
+            // words[i++] = token;
         }
         token = strtok_r(NULL, delim, &saveptr);
         total_tokens++;
