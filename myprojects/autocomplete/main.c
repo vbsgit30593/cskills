@@ -5,13 +5,13 @@
 #include <sys/time.h>
 
 #define ROOT_DATA_PATH "data"
+#define MAX_TOKEN_COUNT 1000000
 
-// Start with a huge static array
-// Make it dynamic later and realloc as per need
-const char* words[1000000];
 
-void naive(int token_count, const char* searchword)
+void naive(const char **words, int token_count, const char* searchword)
 {
+    // Start with a huge static array
+    // Make it dynamic later and realloc as per need
     struct timeval start, end;
     gettimeofday(&start, NULL);
     // if (naive_search(words, token_count, searchword))
@@ -45,10 +45,13 @@ void naive(int token_count, const char* searchword)
 
 int main(int argc, char *argv[])
 {
+    const char* words[MAX_TOKEN_COUNT];
     char filepath[100];
     snprintf(filepath, 100, "%s/%s", ROOT_DATA_PATH, argv[1]);
     const char* searchword = argv[2];
     int token_count = naive_read_from_file(filepath, words);
-    naive(token_count, searchword);
+    printf("Naive token memory size: %fMB\n",
+        naive_mem_in_use(words, MAX_TOKEN_COUNT, token_count)/1e+6);
+    naive(words, token_count, searchword);
     return 0;
 }

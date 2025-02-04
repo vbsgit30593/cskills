@@ -51,8 +51,18 @@ int naive_prefix_search(const char* words[], int size, const char *word,
             }
         }
     }
-
     free(token);
     // returns the number of matches
     return matchidx;
+}
+
+size_t naive_mem_in_use(const char **tbl, size_t static_count, size_t actual_token_count)
+{
+    // total = sum of pointers + sizeof each string
+    size_t total = sizeof(char *) * static_count;
+    for (int i = 0; i < actual_token_count; ++i)
+    {
+        total += strlen(tbl[i]);
+    }
+    return total;
 }
