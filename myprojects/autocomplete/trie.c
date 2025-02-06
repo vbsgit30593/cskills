@@ -116,21 +116,21 @@ bool trie_search(TRIENODE* root, const char* word) {
   return root->terminal;
 }
 
-int main(void)
-{
-  TRIENODE* root = NULL;
-  trie_insertword(&root, "cat");
-  trie_insertword(&root, "car");
-  trie_insertword(&root, "bat");
-  trie_insertword(&root, "vaibhav");
-  trie_insertword(&root, "sing");
-
-  trie_print(root);
-
-  printf("is `vaibhav` present: %d\n", trie_search(root, "vaibhav"));
-  printf("is `vishalv` present: %d\n", trie_search(root, "vishalv"));
-  printf("is `car` present: %d\n", trie_search(root, "car"));
-  printf("is `bar` present: %d\n", trie_search(root, "bar"));
-
-  return 0;
-}
+/* int main(void) */
+/* { */
+/*   TRIENODE* root = NULL; */
+/*   trie_insertword(&root, "cat"); */
+/*   trie_insertword(&root, "car"); */
+/*   trie_insertword(&root, "bat"); */
+/*   trie_insertword(&root, "vaibhav"); */
+/*   trie_insertword(&root, "sing"); */
+/**/
+/*   trie_print(root); */
+/**/
+/*   printf("is `vaibhav` present: %d\n", trie_search(root, "vaibhav")); */
+/*   printf("is `vishalv` present: %d\n", trie_search(root, "vishalv")); */
+/*   printf("is `car` present: %d\n", trie_search(root, "car")); */
+/*   printf("is `bar` present: %d\n", trie_search(root, "bar")); */
+/**/
+/*   return 0; */
+/* } */

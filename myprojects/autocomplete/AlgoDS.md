@@ -52,3 +52,8 @@ L: Length of line
 * Dont directly use the tokens from the buffer. The obtained token just points to the next token address
 * We should ideally do a strdup of the token
 * later we should free all the memory
+
+## Tries
+* This is a DS to store searchable sorted sets of symbolic strings
+Refer: https://www.youtube.com/watch?v=3CbFFVHQrk4&t=58s
+
