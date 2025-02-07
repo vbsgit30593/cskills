@@ -1,4 +1,5 @@
 #pragma once
+#include "trie.h"
 #include <ctype.h>
 #include <errno.h>
 #include <stdbool.h>
@@ -89,7 +90,41 @@ static inline int read_whole_file_and_tokenize(FILE *fptr,
   return i;
 }
 
-int read_data(const char *filepath, const char *words[], StorageType type) {
+static inline int read_whole_file_and_build_trie(FILE *fptr,
+                                                 TRIENODE **trieroot) {
+  struct timeval start, end;
+  gettimeofday(&start, NULL);
+  size_t bufsize = get_file_size(fptr);
+  char *buf = (char *)calloc(1, bufsize);
+  size_t num_read = fread(buf, bufsize, 1, fptr);
+
+  int total_tokens = 0, cleaned_tokens = 0;
+  char *token, *saveptr;
+  const char *delim = " ";
+  token = strtok_r(buf, delim, &saveptr);
+  while (token != NULL) {
+    char *temptoken = strdup(token);
+    // insert into TRIE
+    if (token_to_lower(temptoken)) {
+      trie_insertword(trieroot, temptoken);
+      cleaned_tokens++;
+    }
+    token = strtok_r(NULL, delim, &saveptr);
+    free(temptoken);
+    total_tokens++;
+  }
+  gettimeofday(&end, NULL);
+  printf("Total tokens: %d, cleaned tokens: %d\n", total_tokens,
+         cleaned_tokens);
+  printf("Time spent in reading a file and creating trie: %f\n",
+         (end.tv_usec - start.tv_usec) / 1e+6);
+  free(buf);
+
+  return cleaned_tokens;
+}
+
+static inline int read_data(const char *filepath, const char *words[],
+                            TRIENODE **trieroot, StorageType type) {
   FILE *fptr;
   int token_count = 0;
 
@@ -101,8 +136,8 @@ int read_data(const char *filepath, const char *words[], StorageType type) {
     break;
 
   case TRIE:
-    printf("TRIE_READ_NOT_IMPLEMENTED\n");
-    exit(0);
+    token_count = read_whole_file_and_build_trie(fptr, trieroot);
+    break;
 
   default:
     printf("INVALID storage type\n");

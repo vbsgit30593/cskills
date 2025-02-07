@@ -1,11 +1,35 @@
 #include "main.h"
 #include "naive.h"
 #include "string.h"
+#include "trie.h"
 #include <stdio.h>
 #include <sys/time.h>
 
 #define ROOT_DATA_PATH "data"
 #define MAX_TOKEN_COUNT 1000000
+
+void trieops(const char *filepath, const char *searchword) {
+  TRIENODE *root = NULL;
+  int token_count = trie_read_from_file(filepath, &root);
+  // get trie memory size
+  printf("TRIE memory usage: %fMB\n", trie_mem_usage(root)/1e+6);
+  struct timeval start, end;
+  gettimeofday(&start, NULL);
+
+  /* if (trie_search(root, searchword)) { */
+  /*   printf("Word %s found in TRIE\n", searchword); */
+  /* } else { */
+  /*   printf("Word %s not found in TRIE\n", searchword); */
+  /* } */
+
+  trie_search_all(root, searchword);
+
+  gettimeofday(&end, NULL);
+  printf("\nTotal trie search time: %fs\n",
+         ((end.tv_usec - start.tv_usec) / 1e+6));
+
+  // TODO: free memory used by TRIE
+}
 
 void naive(const char *filepath, const char *searchword) {
   const char *words[MAX_TOKEN_COUNT];
@@ -22,14 +46,11 @@ void naive(const char *filepath, const char *searchword) {
   // Make it dynamic later and realloc as per need
   struct timeval start, end;
   gettimeofday(&start, NULL);
-  // if (naive_search(words, token_count, searchword))
-  // {
-  //     printf("WORD FOUND\n");
-  // }
-  // else
-  // {
-  //     printf("WORD NOT FOUND\n");
-  // }
+  /* if (naive_search(words, token_count, searchword)) { */
+  /*   printf("WORD FOUND\n"); */
+  /* } else { */
+  /*   printf("WORD NOT FOUND\n"); */
+  /* } */
 
   // NAIVE PREFIX SEARCH
   const char *matches[1000];
@@ -56,5 +77,7 @@ int main(int argc, char *argv[]) {
   snprintf(filepath, 100, "%s/%s", ROOT_DATA_PATH, argv[1]);
   const char *searchword = argv[2];
   naive(filepath, searchword);
+  printf("###########\n");
+  trieops(filepath, searchword);
   return 0;
 }

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "fileops.h"
 #include "trie.h"
 /*
  * Prereqs for a Trie -
@@ -31,35 +32,31 @@ TRIENODE *trie_createnode() {
   return newnode;
 }
 
-bool trie_insertword(TRIENODE** root, const char* word) {
+bool trie_insertword(TRIENODE **root, const char *word) {
   // if node is NULL - create node
-  if (*root == NULL)
-  {
+  if (*root == NULL) {
     *root = trie_createnode();
   }
 
-  TRIENODE* temproot = *root;
+  TRIENODE *temproot = *root;
   int len = strlen(word);
 
-  for (int i = 0; i < len; ++i)
-  {
+  for (int i = 0; i < len; ++i) {
     int map_idx = (unsigned int)word[i] - 97;
-    if (temproot->children[map_idx] == NULL)
-    {
+    if (temproot->children[map_idx] == NULL) {
       temproot->children[map_idx] = trie_createnode();
     }
 
     temproot = temproot->children[map_idx];
   }
-  if (temproot->terminal == true) return false; // word already present
+  if (temproot->terminal == true)
+    return false; // word already present
   temproot->terminal = true;
   return true;
 }
 
-static void trie_print_helper(TRIENODE* node, char* prefix, size_t length)
-{
-  if (node == NULL)
-  {
+static void trie_print_helper(TRIENODE *node, char *prefix, size_t length) {
+  if (node == NULL) {
     return;
   }
   // 1 for extra char and 1 for NULL char
@@ -67,16 +64,13 @@ static void trie_print_helper(TRIENODE* node, char* prefix, size_t length)
   memcpy(newprefix, prefix, length);
   newprefix[length + 1] = 0;
 
-  if (node->terminal)
-  {
+  if (node->terminal) {
     printf("%s\t", prefix);
   }
 
   // continue checking children
-  for (int i = 0; i < NUMCHARS; ++i)
-  {
-    if (node->children[i] == NULL)
-    {
+  for (int i = 0; i < NUMCHARS; ++i) {
+    if (node->children[i] == NULL) {
       continue;
     }
     newprefix[length] = (char)(i + 97);
@@ -84,9 +78,8 @@ static void trie_print_helper(TRIENODE* node, char* prefix, size_t length)
   }
 }
 
-void trie_print(TRIENODE* root) {
-  if (root == NULL) 
-  {
+void trie_print(TRIENODE *root) {
+  if (root == NULL) {
     printf("TRIE is empty\n");
     return;
   }
@@ -96,26 +89,88 @@ void trie_print(TRIENODE* root) {
   printf("\n");
 }
 
-bool trie_search(TRIENODE* root, const char* word) {
-  if (root == NULL)
-  {
+TRIENODE *get_last_node_for_prefix(TRIENODE *root, const char *prefix) {
+  if (root == NULL || prefix == NULL)
+    return NULL;
+
+  TRIENODE *temp = root;
+  int len = strlen(prefix);
+  for (int i = 0; i < len; ++i) {
+    int mapidx = (int)(prefix[i]) - 97;
+    if (temp->children[mapidx] == NULL) {
+      return NULL;
+    }
+
+    temp = temp->children[mapidx];
+  }
+  return temp;
+}
+
+void find_terminal_nodes(TRIENODE *last, char *prefix) {
+  trie_print_helper(last, prefix, strlen(prefix));
+}
+
+void trie_search_all(TRIENODE *root, const char *prefix) {
+  // search for the node that matches the last character of prefix
+  char *token = strdup(prefix);
+  token_to_lower(token);
+  TRIENODE *last = get_last_node_for_prefix(root, token);
+  if (last == NULL) {
+    free(token);
+    return;
+  }
+  printf("%s: prefix `%s` found in TRIE\n", __func__, prefix);
+
+  // find all terminal nodes from the last char node
+  find_terminal_nodes(last, token);
+  free(token);
+}
+
+bool trie_search(TRIENODE *root, const char *token) {
+  if (root == NULL) {
     printf("TRIE is empty!! Go add something first my friend!\n");
     exit(0);
   }
 
+  char *word = strdup(token);
+  token_to_lower(word);
   int len = strlen(word);
-  for (int i = 0; i < len; ++i)
-  {
-    int mapidx = ( int )( word[i] ) - 97;
-    if (root->children[mapidx] == NULL)
-    {
+  for (int i = 0; i < len; ++i) {
+    int mapidx = (int)(word[i]) - 97;
+    if (root->children[mapidx] == NULL) {
       return false;
     }
     root = root->children[mapidx];
   }
+
+  free(word);
   return root->terminal;
 }
 
+int trie_read_from_file(const char *filepath, TRIENODE **trieroot) {
+  printf("%s: Reading words from file (%s)\n", __func__, filepath);
+  return read_data(filepath, NULL, trieroot, TRIE);
+}
+
+size_t trie_memstat_helper(TRIENODE* node, size_t curmem)
+{
+  if (node == NULL) return (curmem + sizeof(TRIENODE *));
+
+  curmem += sizeof(TRIENODE);
+  for (int i = 0; i < NUMCHARS; ++i)
+  {
+    if (node->children[i] == NULL) continue;
+
+    curmem = trie_memstat_helper(node->children[i], curmem);
+  }
+
+  return curmem;
+}
+
+size_t trie_mem_usage(TRIENODE* root)
+{
+  return trie_memstat_helper(root, 0);
+}
 /* int main(void) */
 /* { */
 /*   TRIENODE* root = NULL; */

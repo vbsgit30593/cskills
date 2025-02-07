@@ -3,7 +3,7 @@
 
 int naive_read_from_file(const char *filepath, const char *words[]) {
   printf("%s: Reading words from file (%s)\n", __func__, filepath);
-  return read_data(filepath, words, ARRAY);
+  return read_data(filepath, words, NULL, ARRAY);
 }
 
 bool naive_search(const char *words[], int size, const char *word) {

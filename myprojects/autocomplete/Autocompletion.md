@@ -1,8 +1,55 @@
+# Some results
+## TRIE exact match search vs naive linear search
+```
+naive_read_from_file: Reading words from file (data/shakespeare_words.txt)
+Size of file: 5458199
+Total tokens: 901490, cleaned tokens: 894917
+Total file read + tokenization time: 0.076535s
+Naive token memory size: 11.790925MB
+WORD NOT FOUND
+Total naive search time: 0.002824s
+###########
+trie_read_from_file: Reading words from file (data/shakespeare_words.txt)
+Total tokens: 901490, cleaned tokens: 894917
+Time spent in reading a file and creating trie: 0.096412
+Word zoo not found in TRIE
+Total trie search time: 0.000003s
+```
+
+## TRIE prefix match results vs naive prefix match
+```
+naive_read_from_file: Reading words from file (data/shakespeare_words.txt)
+Size of file: 5458199
+Total tokens: 901490, cleaned tokens: 894917
+Total file read + tokenization time: -0.921713s
+Naive token memory size: 11.790925MB
+## Here are your 12 suggestions ##
+ropes   rope    ropeexit        ropesend        ropeantipholus  ropedromio      ropesendantipholus  ropemaker       ropepinch       roping  ropery  ropetricks
+Total naive search time: 0.004218s
+###########
+trie_read_from_file: Reading words from file (data/shakespeare_words.txt)
+Total tokens: 901490, cleaned tokens: 894917
+Time spent in reading a file and creating trie: 0.098203
+trie_search_all: prefix `Rop` found in TRIE
+rope    ropeantipholus  ropedromio      ropeexit        ropemaker       ropepinch  ropery   ropes   ropesend        ropesendantipholus      ropetricks      roping
+Total trie search time: 0.000007s
+```
+
+## TRIE memusage comparison
+* Memusage for Naive approach was - 12MB while for TRIE was 18MB
+
+
+* Though TRIE takes more time to populate but there is a substantial search time difference
+
 # TODO
 * Add a logger
 * Add a hashing API
 * Add a priority queue
-* Add a TRIE
+
+## TRIE TODO
+* read and store to a trie
+* track mem usage
+* track search time
 
 # Other knowledge
 ## Makefiles
