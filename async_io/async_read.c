@@ -88,7 +88,9 @@ int main(int argc, char *argv[])
     buf[size] = '\0';
     printf("Async IO read %zu bytes\n", bytes_read);
     gettimeofday(&end, NULL);
-    printf("Total time spent: %dus\n", end.tv_usec - start.tv_usec);
+    printf("Total time spent: %lfs\n",
+           end.tv_sec - start.tv_sec +
+           (end.tv_usec - start.tv_usec) / 1e6);
 
 cleanup:
     free(aio);

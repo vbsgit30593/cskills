@@ -55,7 +55,10 @@ int main(int argc, char *argv[])
     }
     gettimeofday(&end, NULL);
     // print bytes read
-    printf("Time to read %zu bytes: %dus\n", bytes_read, (end.tv_usec - start.tv_usec));
+    printf("Time to read %zu bytes: %lfs\n", bytes_read,
+           (end.tv_sec - start.tv_sec) +
+           (end.tv_usec - start.tv_usec) / 1e6);
+
     free(buf);
     fclose(fp);
 

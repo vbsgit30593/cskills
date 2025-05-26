@@ -15,3 +15,8 @@
 .idea/
 *.dSYM/
 
+# Ignore tags
+tags
+
+# Ignore file data
+*.data
