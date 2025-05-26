@@ -58,6 +58,7 @@ int main(int argc, char *argv[])
     printf("Time to read %zu bytes: %lfs\n", bytes_read,
            (end.tv_sec - start.tv_sec) +
            (end.tv_usec - start.tv_usec) / 1e6);
+
     free(buf);
     fclose(fp);
 

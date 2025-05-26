@@ -4,3 +4,4 @@
 #### Please subscribe to their channels and follow their tutorials.
 
 ### Please refer `TUTORIAL.md` for all special cases encountered in this playlist.
+### Explore `myprojects` directory for a list of interesting projects I am working on.
