@@ -1,3 +1,10 @@
+/*
+ * What's different:
+ * Freelist keeps track of the list of free array entries.
+ * freelist should have borrow and return functionality.
+ * expected T(n) for both should be O(1). Previously borrow was O(n)
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,6 +13,7 @@
 #include <assert.h>
 
 #define NUM_OBJECTS 1000000
+#define MIN(a, b) (a > b ? a : b)
 
 // Lets start off with a basic memory object structure
 typedef struct {
@@ -15,52 +23,60 @@ typedef struct {
 } OBJECT;
 
 typedef struct POOL_OBJECT {
-    bool allocated;
     OBJECT obj;
+    struct POOL_OBJECT *next;
 } POOL_OBJECT;
 
 POOL_OBJECT mempool[NUM_OBJECTS] = {0};
 
-// Functions required for memory pool management
-POOL_OBJECT *mempool_alloc(void)
-{
-    // basic: lets traverse and find a free slot
-    for (int i = 0; i < NUM_OBJECTS; i++)
-    {
-        if (!mempool[i].allocated)
-        {
-            mempool[i].allocated = true;
-            return &mempool[i];
-        }
-    }
+POOL_OBJECT *freelist = NULL;
+static int freelist_size = NUM_OBJECTS;
 
-    return NULL;
+__attribute__((constructor)) void freelist_init()
+{
+    printf("%s called\n", __FUNCTION__);
+    for (int i = 0; i < NUM_OBJECTS - 1; i++)
+    {
+        mempool[i].next = &(mempool[i + 1]);
+        /* freelist_size++; */
+    }
+    
+    freelist = mempool;
+    mempool[NUM_OBJECTS - 1].next = NULL;
 }
 
-void mempool_free(POOL_OBJECT *ptr)
+// Functions required for memory pool management
+OBJECT *mempool_alloc(void)
 {
-    assert(ptr->allocated == true);
-    // lets initially traverse and free
-    /* for (int i = 0; i < NUM_OBJECTS; i++) */
-    /* { */
-    /*     POOL_OBJECT *cur = &mempool[i]; */
-    /*     if (cur == ptr) */
-    /*     { */
-    /*         mempool[i].allocated = false; */
-    /*         return; */
-    /*     } */
-    /* } */
+    // add to freelist
+    if (!freelist) return NULL;
 
-    unsigned int freeidx = ((uintptr_t)ptr - (uintptr_t)mempool) / sizeof(POOL_OBJECT);
-    assert(&mempool[freeidx] == ptr);
-    mempool[freeidx].allocated = false;
-    // this should not happen; if it happens then this would be a bug
-    /* assert(false && "Could not match the passed address"); */
+    // freelist points to the head of the list always.
+    // return the entry at the head and move forward in the list
+    POOL_OBJECT *borrowed_obj = freelist;
+    freelist = freelist->next;
+    borrowed_obj->next = NULL;
+    freelist_size--;
+    return &(borrowed_obj->obj);
+}
+
+bool mempool_free(OBJECT *ptr)
+{
+    if (freelist_size == NUM_OBJECTS || !ptr || !freelist) return false;
+    unsigned int idx = ((uintptr_t)ptr - (uintptr_t)mempool) / sizeof(POOL_OBJECT);
+    assert(&(mempool[idx].obj) == ptr);
+    // a pool obj is being returned to the pool.
+    // add it to the head of freelist and update head
+
+    mempool[idx].next = freelist;
+    freelist = &(mempool[idx]);
+    freelist_size++;
+    return true;
 }
 
 int main(void) {
     // Allocate some objects from the memory pool
-    #define NUM_ALLOCS (NUM_OBJECTS / 10)
+    #define NUM_ALLOCS (NUM_OBJECTS)
     // Whats the reason for using an array of object pointers here?
     // We have a statically allocated memory pool of OBJECTs. These objects
     // are structs stored in the mempool array. To access any struct, we need to
@@ -70,7 +86,7 @@ int main(void) {
     int round = 1;
     while (round <= 20)
     {
-        POOL_OBJECT *allocated_objects[NUM_ALLOCS] = {0};
+        OBJECT *allocated_objects[NUM_ALLOCS] = {0};
         int alloc_count = rand() % NUM_ALLOCS;
         printf("alloc_count = %d\n", alloc_count);
         int real_alloc = 0;
@@ -80,8 +96,6 @@ int main(void) {
             allocated_objects[i] = mempool_alloc();
             if (allocated_objects[i])
             {
-                assert(allocated_objects[i]->allocated == true);
-                /* printf("%d: Allocated: %p\n", i, allocated_objects[i]); */
                 real_alloc++;
             }
             /* else */
@@ -92,25 +106,16 @@ int main(void) {
         printf("Allocated %d objects from the pool, expected = %d\n",
                real_alloc, alloc_count);
         
-        // freeing all the allocated space
-        int free_count = rand() % NUM_ALLOCS;
+        // freeing some memory
+        int free_count = MIN(rand() % NUM_ALLOCS, real_alloc);
         int real_free = 0;
         for (int i = 0; i < free_count; i++)
         {
-            if (!allocated_objects[i])
-            {
-                /* printf("%d: Object not allocated\n", i); */
-                continue;
-            }
-            if (allocated_objects[i]->allocated)
-            {
-                mempool_free(allocated_objects[i]);
-                /* printf("Freed allocated slot %d\n", i); */
-                real_free++;
-            }
+            if(mempool_free(allocated_objects[i])) real_free++;
         }
         printf("Freed %d objects and returned to pool, expected = %d\n",
                real_free, free_count);
+        printf("Freelist size: %d\n", freelist_size);
         round++;
     }
 
