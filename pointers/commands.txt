@@ -1,0 +1,6 @@
+cut 5 7
+copy 3
+paste 8
+find abcd 3 6
+search abcd 3 8
+end
